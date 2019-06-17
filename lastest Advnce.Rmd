@@ -1,0 +1,649 @@
+---
+title: "Advance Timeline Activities"
+author: "Office Of Talent Research Data"
+date: "6/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+```{r echo=FALSE}
+setwd("C:/Users/schambers11/Desktop/Advance Activity Data/Avd/AVD/advance/")
+Grand1a <- read.csv("grand3a.csv", header = TRUE)
+AVGTIME <- read.csv("timechart.CSV", header = TRUE)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE,
+	autodep = TRUE,
+	cache = TRUE,
+	cache.comments = FALSE
+)
+```
+
+#### The Report
+There are two types of reports offered on The Advance Web Application. The first type of report generates in Excel when you click on a report link. The second type of report generates a Tableau report in a new browser tab when you click the report link. These reports may take a few minutes to load and offer more dynamic data visualizations. There is also an option in each of these reports to export to Excel. In an attempt to better understand which reporting is needed, an analysis was done using User activities in the Advance Web Application with a goal to map out how our current Tableau reports map to the timeline of Advance activities. 
+
+#### Steps and considerations:
+
+1. Map out general trend of downloads over time to see which reports are most used
+2. If particular reports are accessed (excessively) more than others then ask why?
+3. That may be because users:
+a. Lack knowledge of particular reports or,
+b. Don’t have the necessary permissions to access said reports or,
+c. The reports aren’t necessary.
+d. Target audience is lower for particular reports
+
+If 3a is true, then what can the office do to close the knowledge gap?
+If 3b is true, then why are permissions limited?
+If 3c is true, then those reports should be sunset-ed
+
+## Process
+The data was pulled from ORD_INT APPRActivityLog_SessionKey table in SQL. The data was first fitered by _Tableau_ _Reports_ in the _UpdateSourceID_ column in an effort to see the usage of the Tableau Reports in the _Advance_ Web Application (AWA). The below charts show the number of times each report was downloaded. The usage was filtered by User Roles in AWA. i.e Principal, Admins, Secondary Evaluators etc. 
+
+First let's see the general cycle and timeline of Advance activities. 
+<center>
+![Macro Timeline of Advance Activities](C:\Users\schambers11\Desktop\Advance Activity Data\Avd\AVD\advance\Picture1.jpg)
+</center>
+
+## The Data
+
+The data was filtered by the number of times each report was downloaded from the Advance Web Application (AWA). The data set is from April 2018 to April 2019. The data includes the following Tableau Reports:
+
+1. MOTP Progress Report
+2. School Level Completion
+3. Teacher Level Completion
+4. Teacher Performance Report (TPO)
+5. MOSL Selections Report
+6. Teacher Eligibility
+7. NYCPT Error Report
+8. Other [^1]
+9. Superintendent Report
+10. MOTP Data Trends
+11. Assessment Completion Report
+
+[^1]: Other reports include Reports FAQs and PIE Completion Reports
+
+</Center>
+Reports | Total Downloads | 
+-------------| ------------
+MOTP Progress Report | 124231
+School Level Completion | 17904
+Teacher Level Completion | 11865
+Teacher Performance Report (TPO) | 10093
+MOSL Selections Report | 7973
+Teacher Eligibility | 2179
+Other | 1196
+NYCPT Error Report | 940
+Superintendent Report | 614
+MOTP Data Trends | 369
+Assessment Completion Report | 365
+
+</center>
+
+Months |	MOTP Progress Report |	School Level Completion	| Teacher Level Completion |	Teacher Performance Report (TPO) | Assessment Completion Report
+-----------|------------------------|-------------------|-----------------------|------------ |---------
+April 2018 |	6567|	990	| 736 |	381|	9
+May 2018 |	20120 |	2911 |	2171 |	1146|	43
+June 2018	 |9308 |	1351 |	1204 |	1206|	106
+July 2018	 |647 |	132	 |110	 |368|		7
+Aug 2018  |	602  | 102  |	106	 | 499|		2
+Sept 2018  |	2448  |	442  |	713  |	2001|	17
+Oct 2018  |	6365  |	1276 |	778  |	915|	27
+Nov 2018  |	10486 |	1720 |	860 |	524|	45
+Dec 2018 |	10206 |	1525 |	769 |	447|	14
+Jan 2019 |	16150 |	2310 |	1237 |	747|	19
+Feb 2019 |	10637 |	1462 |	853 |	499|	19
+March 2019 |	16080 |	1978 |	1206 |	715|	17
+April 2019 |	14615 |	1705 |	1122 |	645|	40
+
+Months |MOSL Selections Report  |	Teacher Eligibility |	Other |	NYCPT Error Report |	Superintendent Report |	MOTP Data Trends 
+------|------------|---------------|----------------|--------------|-------------|------------
+April 2018 |210 |	81 |	4 |	23 |	35 |	0 
+May 2018 |690 |	206 |	5 |	139 |	108 |	0 
+June 2018 |554 |	161 |	4 |	263 |	102 |	0 
+July 2018 |48 |	24 | 0 |		23 |	83 |0 
+Aug 2018 |106	 |102 |	49 |	20 |	46 |0 
+Sept 2018 |1594 |	541 |391 |	127 |	81 | 0 
+Oct 2018 |3061 |	239	 |162 |	72 |	61 |0 
+Nov 2018 |416 |	106 |	83 |	133 |	40 | 0 
+Dec 2018 |216 |	122 |	56 |	22 |	39 |	42 
+Jan 2019 |463 |	198 |	143 |	38 |	5 |	108 
+Feb 2019 |169 |	95 |	89 |	26 |	5 |	57 
+March 2019 |225 |	175 |	122 |	29 |	4 |	75 
+April 2019 |221 |	129 |	88 |	25 |	5 |	87 
+
+```{r warning=FALSE, fig.height=4}
+library(reshape2)
+library(ggplot2)
+Gra_long <- melt(Grand1a[-13], id="Months")
+
+Gra_long <- data.frame(Gra_long)
+
+Gra_long$Months <- factor(Gra_long$Months, order=TRUE, levels=Gra_long$Months)
+
+colnames(Gra_long)[colnames(Gra_long)=="variable"] <- "Reports"
+
+ggplot(Gra_long, aes(x=Months, y=value, fill=Reports))+ geom_bar(stat="identity", position="dodge") +  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(
+    x = "Months",
+    y = "Downloads")
+
+
+Gra_long3 <- melt(Grand1a[,-c(2,13)], id="Months")
+
+Gra_long3$Months <- factor(Gra_long3$Months, order=TRUE, levels=Gra_long3$Months)
+
+colnames(Gra_long3)[colnames(Gra_long3)=="variable"] <- "Reports"
+
+
+ggplot(Gra_long3, aes(x=Months, y=value, fill=Reports))+ geom_bar(stat="identity", position="dodge") +  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(
+    x = "Months",
+    y = "Downloads")
+
+Grand1a$Months <- factor(Grand1a$Months, order=TRUE, levels=Grand1a$Months)
+
+ggplot(Grand1a, aes(x=Months, y=MOTP.Progress.Report, group=1)) + geom_line(color="red") +  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(
+    x = "Months",
+    y = "MOTP Progress Report Downloads",
+    color = "Cylinders"
+  ) + theme(
+    legend.position = c(0.95, 0.95),
+    legend.justification = c("right", "top")
+  )
+
+Gra_long3$Months <- factor(Gra_long3$Months, order=TRUE, levels=Gra_long3$Months)
+
+ggplot(Gra_long3, aes(x=Months, y=value, fill=Gra_long3$Reports)) + geom_line((aes(group = Reports, color=Reports))) +  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(
+    x = "Months",
+    y = "Downloads",
+    color = "Reports"
+  ) + theme(legend.position="right", legend.box = "horizontal")
+  
+Gra_long4 <- melt(Grand1a[,-c(2,5,6,7,8,9,10,11,12,13)], id="Months")
+
+Gra_long4 <- data.frame(Gra_long4)
+
+
+
+Gra_long4$Months <- factor(Gra_long4$Months, order=TRUE, levels=Gra_long4$Months)
+
+colnames(Gra_long4)[colnames(Gra_long4)=="variable"] <- "Reports"
+
+ggplot(Gra_long4, aes(x=Months, y=value, fill=Reports))+ geom_bar(stat="identity", position="dodge") +  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(
+    x = "Months",
+    y = "Downloads")
+```
+
+```{r fig.height=4}
+plt1<-ggplot(Grand1a, aes(x=Months, y=Teacher.Level.Completion, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("Teacher Level Completion") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt2<-ggplot(Grand1a, aes(x=Months, y=School.Level.Completion, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("School Level Completion") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt3<-ggplot(Grand1a, aes(x=Months, y=Teacher.Performance.Report..TPO., group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) + ggtitle("TPO") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt4<-ggplot(Grand1a, aes(x=Months, y=MOSL.Selections.Report, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) + ggtitle("MOSL Selections Report") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+
+cowplot::plot_grid(plt2, plt1, plt3, plt4,
+                   ncol = 2, rel_heights = c(2, 2),
+                   align = 'v', axis = 'lr')  
+```
+
+```{r fig.height=4}
+plt5<-ggplot(Grand1a, aes(x=Months, y=Teacher.Eligibility, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+ ggtitle("Teacher Eligibilty") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt6<-ggplot(Grand1a, aes(x=Months, y=other, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+ ggtitle("Other") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt7<-ggplot(Grand1a, aes(x=Months, y=NYCPT.Error.Report, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("NYCPT Error Report") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt8<-ggplot(Grand1a, aes(x=Months, y=Superintendent.Report, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("Superintendent Report") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt9<-ggplot(Grand1a, aes(x=Months, y=MOTP.Data.Trends, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("MOTP Data Trends") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+plt10<-ggplot(Grand1a, aes(x=Months, y=Assessment.Completion.Report, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("Assessment Completion") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+cowplot::plot_grid(plt5, plt6, plt7, plt8, plt9, plt10,
+                   ncol = 3, rel_heights = c(4, 4),
+                   align = 'v', axis = 'lr')
+```
+Overall the MOTP Progress Report is the most downloaded report. It was downloaded on Average about 9556 times per month, followed by the School Level Completion Report and Teacher Level Completion Report, with 1377 and 912 respectively.  See the below table for average downloads per month per each report.
+
+```{r echo=FALSE, fig.align="center"}
+library(pander)
+library(kableExtra)
+Average_Downloads <-colMeans(Grand1a[,-1])
+Average_Downloads<-round(as.data.frame(Average_Downloads), 0)
+kable(Average_Downloads)%>%
+  kable_styling(position = "center", latex_options = c("striped"))
+
+```
+
+```{r fig.height=4}
+x <- c(0.01
+,.93, .06)
+labels <- c("Central", "School", "Field Staff")
+
+percents <- c("1%"
+,"93%", "6%")
+
+pie(x, labels=percents, main = "Downloads Of All Reports", col = rainbow(length(x)))
+legend("topright", c("Central", "School", "Field Staff"), cex = 0.8,
+   fill = rainbow(length(x)))
+
+```
+
+```{r echo=FALSE}
+setwd("C:/Users/schambers11/Desktop/Advance Activity Data/Avd/AVD/advance/")
+Principals <- read.csv("Principals.csv", header = TRUE)
+```
+
+## School Level Access
+
+On the school Level, Principals accessed to the reports listed below. The Principal Designee users had similiar access to the principals except access to the Teacher Performance Report (TPO). The secondary evualators only had access to the MOTP Progress Report and Other reports. 
+
+1. MOTP Progress Report
+2. School Level Completion
+3. Teacher Level Completion
+4. Teacher Performance Report (TPO)
+5. MOSL Selections Report
+6. Teacher Eligibility
+7. NYCPT Error Report
+8. Other
+
+\begin{center}
+Downloads at the school level (total)
+\end{center}
+
+
+
+</Center>
+Reports | School Total Downloads | Total Downloads | 
+-------------| ------------ |-----------------
+MOTP Progress Report |118291 | 124231
+School Level Completion |16233 | 17904
+Teacher Level Completion  |11413| 11865
+Teacher Performance Report (TPO) |8778 | 10093
+MOSL Selections Report |6159 | 7973
+Teacher Eligibility |1982 | 2179
+Other  | 971 | 1196
+NYCPT Error Report | 764 | 940
+
+</center>
+
+## Principals 
+
+```{r fig.height=4}
+library(ggplot2)
+Principals$Months <- factor(Principals$Months, order=TRUE, levels=Principals$Months)
+
+p1<-ggplot(Principals, aes(x=Months, y=MOTP.Progress.Report, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("MOTP Progress Report") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+p2<-ggplot(Principals, aes(x=Months, y=School.Level.Completion, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("School Level Completion") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+p3<-ggplot(Principals, aes(x=Months, y=TPO, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+ ggtitle("TPO") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+p4<-ggplot(Principals, aes(x=Months, y=Teacher.Level.Completion, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+ ggtitle("Teacher Level Completion") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+cowplot::plot_grid(p1, p2, p3, p4,
+                   ncol = 2, rel_heights = c(5, 5),
+                   align = 'v', axis = 'lr')
+
+```
+
+```{r}
+p5<-ggplot(Principals, aes(x=Months, y=MOSL.Selections.Report, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("MOSL Selections Report") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+p6<-ggplot(Principals, aes(x=Months, y=Teacher.Eligibility, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("Teacher Eligibility") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+p7<-ggplot(Principals, aes(x=Months, y=NYCPT.Error.Report, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("NYCPT Error Report") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+p8<-ggplot(Principals, aes(x=Months, y=other, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + ggtitle("Other") +
+  labs(
+    x = "Months",
+    y = "Downloads"
+    )
+
+cowplot::plot_grid(p5, p6, p7, p8,
+                   ncol = 2, rel_heights = c(5, 5),
+                   align = 'v', axis = 'lr')
+```
+
+
+## Next let's take a quick look at what other activities the school does in AWA and the average time spent per day on each activity. 
+```{r fig.height=4}
+library(reshape2)
+
+ AVGTIMET <- melt(AVGTIME[,-c(2,3,4,5,6,7,8,9,13,14,15,16,17,18)], id="Activity")
+ 
+ AVGTIMET <- data.frame(AVGTIMET)
+ 
+ AVGTIMET$Activity <- factor(AVGTIMET$Activity, order=TRUE, levels=AVGTIMET$Activity)
+ 
+ colnames(AVGTIMET)[colnames(AVGTIMET)=="variable"] <- "USER"
+ 
+ ggplot(AVGTIMET[which(AVGTIMET$value>0),], aes(x=Activity, y=value, fill=USER))+ geom_bar(stat="identity", position="stack") + 
+         theme_minimal() +  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(
+    x = "Activity",
+    y = "Average Time (Mins)")
+ 
+ AVGTIMET2 <- melt(AVGTIME[c(1,17)], id="Activity")
+ 
+ AVGTIMET2 <- data.frame(AVGTIMET2)
+ 
+ AVGTIMET2$Activity <- factor(AVGTIMET2$Activity, order=TRUE, levels=AVGTIMET2$Activity)
+ 
+ colnames(AVGTIMET2)[colnames(AVGTIMET2)=="variable"] <- "USER"
+ 
+ ggplot(AVGTIMET2[which(AVGTIMET2$value>0),], aes(x=Activity, y=value, fill=USER))+ geom_bar(width= .4, stat="identity", position="dodge") + 
+         theme_minimal() +  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(
+    x = "Activity",
+    y = "Average Time (Mins)")
+ 
+ AVGTIMET3 <- melt(AVGTIME[c(1,2)], id="Activity")
+ 
+ AVGTIMET3 <- data.frame(AVGTIMET3)
+ 
+ AVGTIMET3$Activity <- factor(AVGTIMET3$Activity, order=TRUE, levels=AVGTIMET3$Activity)
+ 
+ colnames(AVGTIMET3)[colnames(AVGTIMET3)=="variable"] <- "USER"
+ 
+```
+
+
+```{r}
+Days<- c("Sunday",
+"Monday",
+"Tuesday",
+"Wednesday",
+"Thursday",
+"Friday",
+"Saturday"
+)
+
+MOTP.Progress.Report <- c(7542,
+24943,
+23532,
+22103,
+22187,
+18249,
+5675
+)
+
+School.Level.Completion <- c(1149,
+3617,
+3397,
+3086,
+3155,
+2668,
+832
+)
+
+Teacher.Level.Completion <- c(679,
+2445,
+2327,
+2095,
+2053,
+1728,
+538
+)
+
+TPO <- c(353,
+1815,
+2091,
+1922,
+1920,
+1658,
+334
+)
+
+MOSL.Selections.Report <- c(199,
+1369,
+1722,
+1531,
+1502,
+1468,
+182
+)
+
+Teacher.Eligibility.Report <- c(81,
+412,
+391,
+446,
+387,
+384,
+78
+)
+
+other <- c(35,
+221,
+204,
+249,
+264,
+186,
+37)
+
+NYCPT.Error.Report <- c(38,
+149,
+173,
+228,
+165,
+160,
+27
+)
+
+Superintendent.Report <- c(11,
+116,
+135,
+123,
+125,
+100,
+4
+)
+
+MOTP.Data.Trends <- c(11,
+96,
+68,
+77,
+69,
+42,
+6
+)
+
+Assessment.Completion.Report <- c(1,
+68,
+88,
+78,
+72,
+56,
+2
+)
+
+Weekdays <- data.frame(Days, MOTP.Progress.Report, School.Level.Completion, Teacher.Level.Completion, TPO, MOSL.Selections.Report, Teacher.Eligibility.Report, other, NYCPT.Error.Report, Superintendent.Report, MOTP.Data.Trends, Assessment.Completion.Report )
+
+
+Weekdays$Days <- factor(Weekdays$Days, order=TRUE, levels=Weekdays$Days)
+
+```
+
+## Downloads By Days of The Week
+
+Generally we see that the most downloads occur on a Monday across all reports. Most of that activity is driven by the MOTP Progress Report. When we exclude the MOPT Progress Report, then Tuesday has the most downloads. Below we can see a list of all the individual report downloads by days of week. Interestingly the NYCPT Error and Teacher Eligibility Reports peaked on a Wednesday while Other reports peaked on a Thursday. 
+
+```{r fig.height=4}
+w5<-ggplot(Weekdays, aes(x=Days, y=MOSL.Selections.Report, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("MOSL Selections") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w6<-ggplot(Weekdays, aes(x=Days, y=Teacher.Eligibility.Report, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("Teacher Eligibility") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w7<-ggplot(Weekdays, aes(x=Days, y=NYCPT.Error.Report, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("NYCPT Error Report") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w8<-ggplot(Weekdays, aes(x=Days, y=other, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("Other") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+cowplot::plot_grid(w5, w6, w7, w8,
+                   ncol = 2, rel_heights = c(5, 5),
+                   align = 'v', axis = 'lr')
+```
+
+```{r fig.height=4}
+w1<-ggplot(Weekdays, aes(x=Days, y=MOTP.Progress.Report, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("MOTP Progress Report") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w2<-ggplot(Weekdays, aes(x=Days, y=School.Level.Completion, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("School Completion") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w3<-ggplot(Weekdays, aes(x=Days, y=TPO, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("TPO") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w4<-ggplot(Weekdays, aes(x=Days, y=Teacher.Level.Completion, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("Teacher Level Comp.") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+cowplot::plot_grid(w1, w2, w3, w4,
+                   ncol = 2, rel_heights = c(5, 5))
+```
+
+```{r fig.height=4}
+w9<-ggplot(Weekdays, aes(x=Days, y=Superintendent.Report, group=1)) + geom_line(color="orange") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("Superintendent Report") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w10<-ggplot(Weekdays, aes(x=Days, y=MOTP.Data.Trends, group=1)) + geom_line(color="lightblue") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("MOTP Data Trends") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+w11<-ggplot(Weekdays, aes(x=Days, y=Assessment.Completion.Report, group=1)) + geom_line(color="yellow") + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))  + ggtitle("Assessment Completion") +
+  labs(
+    x = "Days",
+    y = "Downloads"
+    )
+
+cowplot::plot_grid(w9, w10, w11,
+                   ncol = 2, rel_heights = c(3, 3))
+```
+## Final Observations
+
+1. The MOTP Progress Report is the most downloaded report across all user types. This is partly because
+  a. More users have access to the report
+  b. It is used more to track schools' progress in completing the MOTP
+2. The School level Completion and Teacher Completion Report are the 2nd & 3rd most downloaded reports. The Teacher Level Completion report is being Sunset-ed after the redesign of AWA, since the information will be visible on the primary dashboard. It's important to then allow users a way to pull to pull the information from the website.
+3. The Field Staff don't download the reports as often as one would anticpate. It would be assumed that they would use the information in the reports to help assist the schools under their perview more often but that isn't the case. Questions to considers:
+  a. Why are they only 6% of total downloads?
+  b. Is there a knowledge gap about the contents and usage of the reports?
+  c. Is the central staff and owner of the reports distributing the right infdormation to close the knowledge gap, if it exist?
+4. Certain reports aren't accessed because of the access permissions.
+  a. Why aren't certain users allowed access to particular reports if it is useful to make more informed decisions?
+  
+
+Future Questions:
+
+How will the DOE provide this information when/if they stop using Tableau?
+
+
